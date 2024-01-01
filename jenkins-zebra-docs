@@ -1,0 +1,101 @@
+Installed form scratch on server
+cd /application
+# in jekins
+export JENKINS_HOME=/application/jenkins/application/JAVA/jdk-11.0.16/bin/java -Xmx1024m -jar jenkins.war --httpPort=7070 &
+7070(pune)
+8080(GCP)
+
+SCP host name in configure system? 
+GitHub Pull Request Builder?
+
+*Thin backup plugin why? once env config was deleted because of some installation issue.(all config bk, plugin bk,env bk, users bk)
+ /application/jenkinsBackup - here zip will be there. copy them in application/jenkins
+ 
+* SCP don't need pass as appadmin user has passwd less access
+* jenkins_user@zebra.com - user to trigger email
+
+*Configure system - req. config done
+1. blackduck - Synopsys Detect plugin
+        stage('Black Duck Scanning') {
+            when {
+                expression { params.buildAction == 'Black Duck Scanning'}
+            }
+            steps {
+                echo 'Black Duck Scan started' 	
+            dir("${WORKSPACE_DIR}/rflx-tm-creator-web"){
+                sh "pwd"
+                }
+
+                synopsys_detect detectProperties: '''--blackduck.trust.cert=true  \\
+                --logging.level.com.synopsys.integration=debug \\
+                --detect.source.path=./ \\
+                --detect.excluded.directories="DBScripts,Static" \\
+                --detect.excluded.directories.defaults.disabled=false \\
+                --detect.detector.search.depth=100 \\
+                --detect.excluded.directories.search.depth=100 \\
+                --detect.project.name=project-name \\
+                --detect.project.version.name="${BUILD_VERSION}" \\
+                --detect.report.timeout=3600 \\
+                --detect.wait.for.results=false \\
+                --detect.npm.include.dev.dependencies=false \\
+                --detect.npm.include.peer.dependencies=false \\
+                --detect.risk.report.pdf=true''', downloadStrategyOverride: [$class: 'ScriptOrJarDownloadStrategy']
+
+                echo 'Black Duck Scan completed for rflx-tm-creator-web'
+                }
+				script {
+                     def status = currentBuild.currentResult.toString().toLowerCase()
+                     def subject = "Black Duck : ${currentBuild.currentResult} : ${env.GIT_BRANCH} : ${env.JOB_NAME} : ${env.BUILD_NUMBER}"
+                     def body = "The Jenkins build for ${env.JOB_NAME} and build number ${env.BUILD_NUMBER} has completed with a status of ${status}. More Info can be found here: ${env.BUILD_URL}"
+                     emailext ( body: body, subject: subject, to: '${mailid}', attachLog: true, recipientProviders: [[$class: 'DevelopersRecipientProvider']], attachmentsPattern: '**/*_BlackDuck_RiskReport.pdf')
+                 }
+            }
+    }
+2. sonarqube
+3. SCP - install plugin and configure system(hostname,port,username,pass(sometimes can have a user without pass also))
+   steps {
+            script {
+               # using sshagent for scp also
+                sshagent(credentials: ["${creds}"]) { #creds is IP value stored as variable in configure system
+                    echo 'Copy files to xyz server'
+                    sh "chmod 755 ${file/path/}"
+                    sh "scp -pr ${file/path/} ${SSH_USER}@${creds}:${TARGET_PATH}"
+                  }
+            }
+
+4. SSH - install SSH plugin and configure system(hostname,port,username,pass(sometimes can have a user without pass also))
+         (This plugin executes shell commands remotely using SSH protocol)
+   steps {
+            script {
+                sshagent(credentials: ["${creds}"]) {
+                    # to run some .shh files
+                    sh "ssh ${SSH_USER}@${creds} '${TARGET_files-location} && ${TARGET_files-location}'"
+                }
+            }
+5. jfrog - install plugin
+   steps {
+            script {
+                def jFrog = Artifactory.server "${TARGET_QA_ARTIFACTORY}"
+                def uploadSpec = """{
+                      "files": [
+                            {
+                              "pattern": "????",
+                              "target": "path/in/jfrog"
+                            },
+                            {
+                              "pattern": "????",
+                              "target": "path/in/jfrog"
+                            }
+                     ]
+                }"""
+                jFrog.upload spec: uploadSpec
+                }
+            }
+        }
+6. env var set these in configure syatem.
+7. slack notification plugin
+
+/RTM_jenkins_job_jenkins_branch/RTM - here blackduck .pdf will be saved
+
+*sonarqube project will be created by other, need to raise ticket for that, in jira - search tools in project
+* how to add slack channel, teams, office365 connector plugin for post action etc in jenkins.
