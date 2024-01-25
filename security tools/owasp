@@ -1,0 +1,9 @@
+owasp is a dependency check tool, looks for pom.xml for dependabcies, it downloads files from 2002 till date from its DB. and compare pom dependancies with it.
+jenkins plugin -OWASP Dependency-CheckVersion 5.4.3 
+under global tools - install automatically (Install from github.com) and required version
+stage('OWASP Dependency Check') {
+            steps {
+                dependencyCheck additionalArguments: '', odcInstallation: 'DC'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
