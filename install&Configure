@@ -46,8 +46,8 @@ Authorisation (Manage jenkins-> security-> authentication)
 Plugins
 Git, GitHub (fot github webhook), credentials, credentialsbinding 
 GitHub Branch Source Plugin  -------for multiple branch
-JDK plugin (Eclipse Temurin installer)------ can have multiple jdk versions (select perticular in pipeline tools block)
-mvn plugin ------can have multiple mvn versions (select perticular in pipeline tools block)
+JDK plugin (Eclipse Temurin installer) and configure in tools section,Install from adoptium.net------ can have multiple jdk versions (select perticular in pipeline tools block)
+mvn plugin ---configure in tool, and install from apache ---can have multiple mvn versions (select perticular in pipeline tools block)
 Docker--This plugin integrates Jenkins with Docker
 Docker pipeline--Build and use Docker containers from pipelines.
 docker biuld-steps--This plugin allows to add various docker commands to your job as build steps.
