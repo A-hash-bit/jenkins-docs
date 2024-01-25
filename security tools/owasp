@@ -4,6 +4,7 @@ under global tools - install automatically (Install from github.com) and require
 stage('OWASP Dependency Check') {
             steps {
                 dependencyCheck additionalArguments: '', odcInstallation: 'DC'
+            #   dependencyCheck additionalArguments: ' --scan ./', odcInstallation: 'DC'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
