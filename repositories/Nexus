@@ -1,1 +1,20 @@
+Nexus is a product of Sonatype.
+There are many nexus tools (nexus repository, nexus container, nexus firewall)
+store - jar,war, container image, helm charts,reports, logs zip, tar, linux pkg, rpm pkg.......
+default port 8081
+nexus has prod(release) and non-prod(snapshot) repos.
 
+*Proxy repos -from ogr. system some repos are not directly accissible so they provide proxy repos. which cache the response(if not presnt) then talk to main/central repo.
+* Group repo - it can contain multiple repo(Hosted(ogr. private data), proxy(help to connect to public repos)) and have single URL so can access both.
+             - it can have multiple hosted repo(Diffrent teams) but will have same URL so CI server can talk to all repos.
+
+Nexus give by default maven release/snapshot hosted repos.
+- release needs to have diffrent version 1.0. 1.1....
+- snapshot doesnt req. to have diffrent version nexus append timestamp.
+
+* Replication - replicator helps
+- u can replicate a repo from diffrent nexus srever to ur nexus server
+- can have bi-derctional replication also
+
+* Can have user, and can be accessed by ananonymus use but they have only read.
+- can give access to particular repos only.
