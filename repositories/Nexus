@@ -18,3 +18,15 @@ Nexus give by default maven release/snapshot hosted repos.
 
 * Can have user, and can be accessed by ananonymus use but they have only read.
 - can give access to particular repos only.
+
+--------------
+to push to nexus in jenkins 
+- add the particular repo URL in pom.xml
+- install config file provider plugin --> create a global/local xml file --> add uname/pass.
+ stage('Deploy to Nexus') {
+            steps {
+                withMaven(globalMavenSettingsConfig: 'global-maven', jdk: 'jdk17', maven: 'maven3', mavenSettingsConfig: '', traceability: true) {
+                    sh "mvn deploy -DskipTests=true"
+                }
+            }
+        }
