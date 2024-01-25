@@ -59,6 +59,7 @@ sonarqube scanner --> configure in tools section-->
 Config File Provider --> Ability to provide configuration files (e.g. settings.xml for maven, XML, groovy, custom files,...) loaded through the UI which will be copied to the job workspace.
   manage jenkins-->managed files
 Distributed Workspace Clean
+nexus artifact uploader --> to push to nexus
 
 
 aws ECR
