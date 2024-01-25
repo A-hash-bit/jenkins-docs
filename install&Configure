@@ -1,0 +1,88 @@
+jenkins install and configure
+
+https://phoenixnap.com/kb/install-jenkins-ubuntu#:~:text=Step%201%3A%20Install%20Java,-Jenkins%20requires%20the&text=At%20the%20time%20of%20writing,set%20as%20the%20default%20version.&text=Since%20Java%20is%20not%20installed,will%20install%20it%20using%20OpenJDK.
+Jenkins installation on linux(Ubuntu)
+
+hardware req:- 
+
+connect to server
+become root (sudo su) to install 
+java is prerequisite for jenkins as jenkins is built on java
+-> apt update
+-> sudo apt install openjdk-8-jdk -y or sudo apt install openjdk-11-jdk -y (sometimes jenkins doesnt work with some java -version so try to change it)
+-> java -version
+
+It is recommended to install Jenkins using the project-maintained repository, rather than from the default Ubuntu repository. 
+The reason for that is because the Jenkins version in the default Ubuntu repository might not be the latest available version, 
+which means it could lack the latest features and bug fixes.
+
+Follow the steps below to add the Jenkins repository to your Ubuntu system.
+1. curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | sudo tee \
+    /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+2.echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+2.1 apt update
+3. apt-get install jenkins
+4. systemctl status jenkins
+it runs on 8080 bydefault so open that port on server (serverIP:8080 on google)
+5./var/lib/jenkins/secrets/initialAdminPassword (on server here is ur new passwd cat it)
+
+netstat -lntup to see port running
+/etc/default/jenkins file path where jenkins configuration is present
+/var/lib/jenkins is jenkins home directory its under <user directory>
+
+6.Install suggested plugins after login for first time
+7.create user (user1/user1)
+
+Authorisation (Manage jenkins-> security-> authentication)
+(Matrix Authorization Strategy Plugin Version3.2 for both matrix based)
+1.Matrix based security 
+2.Project based matrix authorisation strategy (Manage jenkins-> security-> authentication) enable it here then only u can find it in configure job 
+*U can have group based matrix but need LDAP, linux groups or any active directory linked with jenkins, by default users are saved in jenkins own user DB
+3.Role base access control (Role-based Authorization Strategy Version 689.v731678c3e0eb_) Manage jenkins-> security-> authentication) enable it here then only u can find it in Manage jenkins->manage & assign roles
+  (it can be global or project/item level)
+  
+*for checkout code from any git repo u need git to be installed on server/agent (git will clone the code at(Jenkins home) var/lib/jenkins/workspace/<job-name>)
+
+Plugins
+Git, GitHub (fot github webhook), credentials, credentialsbinding 
+GitHub Branch Source Plugin  -------for multiple branch
+JDK plugin (Eclipse Temurin installer)------ can have multiple jdk versions (select perticular in pipeline tools block)
+mvn plugin ------can have multiple mvn versions (select perticular in pipeline tools block)
+Docker--This plugin integrates Jenkins with Docker
+Docker pipeline--Build and use Docker containers from pipelines.
+docker biuld-steps--This plugin allows to add various docker commands to your job as build steps.
+clousbees docker build and publish--This plugin enables building Dockerfile based projects, as well as publishing of the built images/repos to the docker registry.
+Docker slave --Uses Docker containers to run Jenkins build agents.
+SSH plugin ---- Allows to launch agents over SSH, using a Java implementation of the SSH protocol.
+SSH credentials ----- Allows storage of SSH credentials in Jenkins
+sonarqube scanner --> configure in tools section-->
+Config File Provider --> Ability to provide configuration files (e.g. settings.xml for maven, XML, groovy, custom files,...) loaded through the UI which will be copied to the job workspace.
+  manage jenkins-->managed files
+Distributed Workspace Clean
+
+
+aws ECR
+
+*In system section we configure server details (eg. sonar server,)
+*In tools section we configure tools version and installation
+*Sonar server setup on server as docker container -----> docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+
+#Master-Slave configuration
+1.install java on both servers(master, slave)
+2.create a directory in root in opt mkdir /jenkins in slave (which we need to add in configuration in master)
+  2.1 chmod 755 jenkins
+* Node lable in node configuration helps to add multiple node in one node/slave cluster
+3. get hostname or hostname -i (ip) of slave
+4. ssh-keygen 
+5. cat private key and add to the add node configuration in jenkins (add username - root and private key)  ----- why root?
+
+6. on slave server cd ~/.ssh/  ----> ls --->  authorized_keys file (insert slave pub key)
+7. check on slave -> ps -ef | grep -i jenkins   (if jenkins is present means jenkins deligated its processes to slave)
+
+Install docker plugin and configure docker 
+install docker on jenkins/slave server - https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-20-04
+Grant Jenkins user permission to docker deamon.
+sudo su - 
+useradd jenkins -------creating user jenkins on slave (created bydefault on master)
+chmod 777 /var/run/docker.sock   ------- permission (on matser and slave)
+usermod -aG docker jenkins  (on matser and slave)
