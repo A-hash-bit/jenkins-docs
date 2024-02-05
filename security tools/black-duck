@@ -1,0 +1,11 @@
+Blackduck, developed by Synopsys, is a software that helps manage the risks associated with using open-source and third-party code in your applications and containers.
+It focuses on three main areas: security, quality, and license compliance.
+- Scans your codebase to identify all embedded open-source components for known vulnerabilities and new vulnerabilities against vast knowledge base.
+- ckecks for bugs, depricated libs, 
+- Check for licences and complieces and changes(if) for open source code/components/libs
+
+* for integrating BlackDuck with Jenkins is through the Synopsys Detect plugin.
+- Prerequisites:
+Jenkins instance: Ensure you have a running Jenkins instance.
+BlackDuck server: You need access to a BlackDuck server with appropriate permissions.
+Synopsys Detect client: Download and install the Synopsys Detect client compatible with your BlackDuck server version.
